@@ -1,12 +1,17 @@
-import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
 
 public class main
 {
-  private static int WindowCount = 0;
-  
+  public static final Point screen = new Point((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight());
+  public static double Timer = -1;
+
   public static void main(String args[])
   {
+    int WindowCount;
+
     while (true)
     {
       // Game start
@@ -48,12 +53,21 @@ public class main
 
   private static JFrame MainWindow(String name)
   {
+    final Point W = new Point(600, 400);
+    final Point P = new Point((main.screen.x - W.x) / 2, (main.screen.y - W.y) / 2);
     JFrame R = new JFrame(name);
     R.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    R.setSize(600, 400);
-    R.setLocationRelativeTo(null);
+    R.setSize(W.x, W.y);
     R.setResizable(false);
-    R.setVisible(true);
+    
+    R.setLocation(P);
+    R.addComponentListener(new ComponentAdapter()
+    {
+      @Override public void componentMoved(ComponentEvent e)
+      {
+        R.setLocation(P);
+      }
+    });
 
     R.addWindowListener(new WindowListener()
     {
@@ -67,20 +81,44 @@ public class main
       @Override public void windowDeiconified(WindowEvent e) {}
       @Override public void windowActivated(WindowEvent e) {}
       @Override public void windowDeactivated(WindowEvent e) {}
-      @Override public void windowStateChanged(WindowEvent e) {}
     });
 
+    if (main.Timer < 0)
+    {
+      JLabel L = new JLabel("Ready to Bop It?");
+      L.setFont(L.getFont().deriveFont(20f));
+      L.setHorizontalAlignment(SwingConstants.CENTER);
+      R.add(L, BorderLayout.CENTER);
+    }
+    else
+    {
+      JLabel L = new JLabel("Best time: " + main.Timer);
+      L.setFont(L.getFont().deriveFont(20f));
+      L.setHorizontalAlignment(SwingConstants.CENTER);
+      R.add(L, BorderLayout.CENTER);
+    }
+
+    R.setVisible(true);
     return R;
   }
 
   private static JFrame ActionWindow(String name)
   {
+    final Point W = new Point((int)(Math.random() * 2 + 3) * 100, (int)(Math.random() * 2 + 3) * 100);
+    final Point P = new Point((int)(Math.random() * (main.screen.x - W.x)), (int)(Math.random() * (main.screen.y - W.y)));
     JFrame R = new JFrame(name);
     R.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    R.setSize(400, 400);
-    R.setLocation((int)(Math.random() * 100), (int)(Math.random() * 100));
+    R.setSize(W.x, W.y);
     R.setResizable(false);
-    R.setVisible(true);
+
+    R.setLocation(P);
+    R.addComponentListener(new ComponentAdapter()
+    {
+      @Override public void componentMoved(ComponentEvent e)
+      {
+        R.setLocation(P);
+      }
+    });
 
     R.addWindowListener(new WindowListener()
     {
@@ -94,9 +132,9 @@ public class main
       @Override public void windowDeiconified(WindowEvent e) {}
       @Override public void windowActivated(WindowEvent e) {}
       @Override public void windowDeactivated(WindowEvent e) {}
-      @Override public void windowStateChanged(WindowEvent e) {}
     });
     
+    R.setVisible(true);
     return R;
   }
 
