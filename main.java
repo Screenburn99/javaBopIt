@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-//import java.util.*;
+import java.util.*;
 import javax.swing.*;
 
 public class main
@@ -8,23 +8,32 @@ public class main
   public static final Point screen = new Point((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight());
   public static double GameTime = -1;
   public static int WindowCount;
+  public static boolean ConditionMet;
+  public static int TabOrder;
 
   public static void main(String args[])
   {
     int ThisWindowCount;
+    ConditionMet = true;
 
     while (true)
     {
       // Game start
-      WaitForClose(MainWindow("Bop It"));
+      if (ConditionMet)
+        WaitForClose(MainWindow("Bop It"));
+      else
+        WaitForClose(DefeatWindow());
       WindowCount = (int)(Math.random() * 10 + 6);
       ThisWindowCount = WindowCount;
       GameTime = System.currentTimeMillis();
       while (ThisWindowCount > 0)
       {
         // Game loop
-        WaitForClose(ActionWindow("/* " + ThisWindowCount + " */"));
+        ConditionMet = false;
+        WaitForClose(ActionWindow(ThisWindowCount + " Remain"));
         ThisWindowCount--;
+        if (!ConditionMet)
+          break;
       }
       GameTime = (System.currentTimeMillis() - GameTime) / 1000;
     }
@@ -68,7 +77,7 @@ public class main
       }
     });
 
-    if (main.GameTime < 0)
+    if (GameTime < 0)
     {
       JLabel L = new JLabel("Ready to Bop It?");
       L.setFont(L.getFont().deriveFont(30f));
@@ -90,7 +99,7 @@ public class main
     }
     else
     {
-      JLabel L = new JLabel("<html>Total: " + (main.GameTime) + " seconds<br>Average: " + (main.GameTime / main.WindowCount) + " per window</html>");
+      JLabel L = new JLabel("<html>Total: " + (Math.floor(GameTime * 1000) / 1000) + " seconds<br>Average: " + (Math.floor(GameTime / WindowCount * 1000) / 1000) + " per window</html>");
       L.setFont(L.getFont().deriveFont(30f));
       L.setHorizontalAlignment(SwingConstants.CENTER);
       R.add(L, BorderLayout.CENTER);
@@ -158,7 +167,47 @@ public class main
       @Override public void windowDeactivated(WindowEvent e) {}
     });
     
-    //R.add(TabbedButton("Bop It", "False Sun"));
+    R.add(RandomElement(W));
+    R.setVisible(true);
+    return R;
+  }
+
+  private static JFrame DefeatWindow()
+  {
+    final Point W = new Point(600, 400);
+    final Point P = new Point((main.screen.x - W.x) / 2, (main.screen.y - W.y) / 2);
+    JFrame R = new JFrame("DEFEAT");
+    R.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    R.setSize(W.x, W.y);
+    R.setResizable(false);
+    
+    R.setLocation(P);
+    R.addComponentListener(new ComponentAdapter()
+    {
+      @Override public void componentMoved(ComponentEvent e)
+      {
+        R.setLocation(P);
+      }
+    });
+
+    JLabel L = new JLabel("FAILURE");
+    L.setFont(L.getFont().deriveFont(60f));
+    L.setHorizontalAlignment(SwingConstants.CENTER);
+    R.add(L, BorderLayout.CENTER);
+
+    JButton B = new JButton("AGAIN");
+    B.setPreferredSize(new Dimension(100, 50));
+    B.setFont(B.getFont().deriveFont(20f));
+    B.addActionListener(new ActionListener()
+    {
+      @Override public void actionPerformed(ActionEvent e)
+      {
+        R.setEnabled(false);
+        R.dispose();
+      }
+    });
+    R.add(B, BorderLayout.SOUTH);
+
     R.setVisible(true);
     return R;
   }
@@ -181,43 +230,106 @@ public class main
       Wait(0.1);
   }
 
-  private static Component TabbedButton(String name, String text)
+  private static Component RandomElement(Point size)
   {
-    JButton B = new JButton(text);
-    B.setPreferredSize(new Dimension(100, 50));
-    B.setFont(B.getFont().deriveFont(20f));
-    B.addActionListener(new ActionListener()
+    int I = (int)Math.floor(Math.random() * 4);
+    switch (I)
     {
-      @Override public void actionPerformed(ActionEvent e)
-      {
-        JFrame R = new JFrame(name);
-        R.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        R.setSize(200, 200);
-        R.setLocationRelativeTo(null);
-        R.setVisible(true);
-      }
-    });
-    return B;
-  }
-
-  static class CirclePanel extends JPanel
-  {
-    @Override protected void paintComponent(Graphics g)
-    {
-      super.paintComponent(g);
-      g.setColor(Color.BLUE);
-      g.fillOval(50, 50, 100, 100); // Draw a blue circle
+      case 1:
+        String F1 = new String[] {"You smell.", "Cheese!", "Hike near!", "True!", "False!"}[(int)(Math.random() * 5)];
+        JButton F = new JButton(F1);
+        F.setFont(F.getFont().deriveFont(30f));
+        F.addActionListener(new ActionListener()
+        {
+          @Override public void actionPerformed(ActionEvent e)
+          {
+            ConditionMet = false;
+          }
+        });
+        ConditionMet = true;
+        return F;
+      case 2:
+        JButton B = new JButton("Click here!");
+        B.setFont(B.getFont().deriveFont(30f));
+        B.addActionListener(new ActionListener()
+        {
+          @Override public void actionPerformed(ActionEvent e)
+          {
+            ConditionMet = true;
+          }
+        });
+        return B;
+      case 3:
+        ArrayList<Boolean> A = new ArrayList<Boolean>();
+        JTabbedPane T = new JTabbedPane();
+        TabOrder = 0;
+        for (int J = 0; J < 3; J++)
+          A.add(AddRandomTab(T, J, A));
+        if (!A.contains(true))
+          ConditionMet = true;
+        return T;
+      default:
+        String S1 = new String[] {":)", ":3", ":D", ">:(", ":(", ">:)", ">:3", "-_-", "._.", "'-'", "o7", "", "hax", "Faster!", "GG"}[(int)(Math.random() * 15)];
+        JLabel S = new JLabel(S1);
+        S.setFont(S.getFont().deriveFont(60f));
+        S.setHorizontalAlignment(SwingConstants.CENTER);
+        ConditionMet = true;
+        return S;
     }
   }
 
-  // Panel for drawing a rectangle
-  static class RectanglePanel extends JPanel
+  private static boolean AddRandomTab(JTabbedPane T, int I, ArrayList<Boolean> A)
   {
-    @Override protected void paintComponent(Graphics g)
+    JButton B;
+    if ((int)(Math.random() * 2) == 0)
     {
-      super.paintComponent(g);
-      g.setColor(Color.RED);
-      g.fillRect(50, 50, 150, 100); // Draw a red rectangle
+      B = new JButton("Click here!");
+      B.setFont(B.getFont().deriveFont((int)(Math.random() * 4 + 2) * 10f));
+      B.addActionListener(new ActionListener()
+      {
+        @Override public void actionPerformed(ActionEvent e)
+        {
+          if (TabOrder > -1)
+            if (TabOrder != I)
+            {
+              TabOrder = -1;
+              ConditionMet = false;
+            }
+            else
+            {
+              TabOrder++;
+              if (TabOrder >= A.size())
+                ConditionMet = true;
+              else
+                while (!A.get(TabOrder))
+                {
+                  TabOrder++;
+                  if (TabOrder >= A.size())
+                  {
+                    ConditionMet = true;
+                    break;
+                  }
+                }
+            }
+        }
+      });
+      T.addTab("Tab " + (I + 1), B);
+      return true;
+    }
+    else
+    {
+      B = new JButton("Lick ear!");
+      B.setFont(B.getFont().deriveFont((int)(Math.random() * 4 + 2) * 10f));
+      B.addActionListener(new ActionListener()
+      {
+        @Override public void actionPerformed(ActionEvent e)
+        {
+          TabOrder = -1;
+          ConditionMet = false;
+        }
+      });
+      T.addTab("Tab " + (I + 1), B);
+      return false;
     }
   }
 }
