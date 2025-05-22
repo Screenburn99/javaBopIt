@@ -37,26 +37,6 @@ public class main
       }
       GameTime = (System.currentTimeMillis() - GameTime) / 1000;
     }
-
-    /*
-    // Create the main frame
-    JFrame frame = new JFrame("Shape Drawer");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(400, 400);
-    
-    // Create a tabbed pane
-    JTabbedPane tabbedPane = new JTabbedPane();
-    
-    // Add tabs with custom panels for drawing shapes
-    tabbedPane.addTab("Circle", new CirclePanel());
-    tabbedPane.addTab("Rectangle", new RectanglePanel());
-    
-    // Add the tabbed pane to the frame
-    frame.add(tabbedPane);
-    
-    // Make the frame visible
-    frame.setVisible(true);
-    */
   }
 
   private static JFrame MainWindow(String name)
@@ -116,19 +96,6 @@ public class main
         }
       });
       R.add(B, BorderLayout.SOUTH);
-      /*
-      JButton C = new JButton("Exit");
-      C.setPreferredSize(new Dimension(100, 50));
-      C.setFont(C.getFont().deriveFont(20f));
-      C.addActionListener(new ActionListener()
-      {
-        @Override public void actionPerformed(ActionEvent e)
-        {
-          System.exit(0);
-        }
-      });
-      R.add(C, BorderLayout.SOUTH);
-      */
     }
 
     R.setVisible(true);
@@ -267,6 +234,9 @@ public class main
           A.add(AddRandomTab(T, J, A));
         if (!A.contains(true))
           ConditionMet = true;
+        else if (!A.getFirst())
+          while (!A.get(TabOrder))
+            TabOrder++;
         return T;
       default:
         String S1 = new String[] {":)", ":3", ":D", ">:(", ":(", ">:)", ">:3", "-_-", "._.", "'-'", "o7", "", "hax", "Faster!", "GG"}[(int)(Math.random() * 15)];
